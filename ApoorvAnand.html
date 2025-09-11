@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Apoorv Anand - Technical Solutions Professional and Full Stack Developer portfolio showcasing skills, experience, and projects">
+    <meta name="keywords" content="Apoorv Anand, Technical Solutions Professional, Full Stack Developer, Web Developer, React, JavaScript, Python, Portfolio">
+    <meta name="author" content="Apoorv Anand">
+    <meta property="og:title" content="Interactive Portfolio | Apoorv Anand">
+    <meta property="og:description" content="Portfolio showcasing my skills, experience, and projects as a Technical Solutions Professional and Full Stack Developer">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://apoorvanand.github.io/">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="canonical" href="https://apoorvanand.github.io/">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💼%3C/text%3E%3C/svg%3E">
+    <title>Apoorv Anand - Technical Solutions Professional & Full Stack Developer</title>
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" as="script" href="https://cdn.tailwindcss.com">
+    <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/chart.js">
+    <!-- Chosen Palette: Modern Tech (Slate, with Indigo accent) -->
+    <!-- Application Structure Plan: Retains the single-page vertical scroll with a fixed sidebar for usability. The core change is a visual and interactive upgrade. The skills section is transformed from a simple chart into an impressive radar chart for categorical skill comparison and detailed progress bars for specific technologies. This structure is better for a portfolio as it visually emphasizes technical proficiency in a more granular and modern way, immediately showing strengths to a recruiter. -->
+    <!-- Visualization & Content Choices: 1. Skills Balance -> Goal: Compare/Organize -> Viz: Radar Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. Justification: A radar chart is more visually compelling and professional for showing balanced strengths across different domains (e.g., development vs. client-facing skills) than a doughnut chart. 2. Specific Skills -> Goal: Inform -> Viz: Animated Progress Bars (HTML/CSS) with Icons -> Interaction: Visual feedback on load/scroll. Justification: Provides a clean, scannable, and modern way to list individual tech skills, replacing a plain text list. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            left: -0.625rem;
+            top: 0.25rem;
+            transform: translateX(-50%);
+            background-color: #4f46e5; /* indigo-600 */
+            border: 4px solid #f8fafc; /* slate-50 */
+            z-index: 10;
+        }
+        .details-content {
+            transition: all 0.4s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+        .details-content.open {
+            max-height: 500px;
+            opacity: 1;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 350px;
+            max-height: 400px;
+            width: 100%;
+            max-width: 450px;
+        }
+        .nav-link.active {
+            color: #4f46e5; /* indigo-600 */
+            transform: translateX(5px);
+            font-weight: 700;
+        }
+        .progress-bar-fill {
+            transition: width 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        /* Performance optimizations */
+        .chart-container canvas {
+            will-change: transform;
+        }
+        .timeline-item {
+            will-change: transform;
+        }
+        /* Smooth scrolling for better UX */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar Navigation -->
+        <aside class="w-1/4 bg-white border-r border-slate-200 p-8 sticky top-0 h-screen hidden lg:flex flex-col justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-indigo-600">Apoorv Anand</h2>
+                <p class="text-sm text-slate-500">Technical Solutions Professional</p>
+                <nav class="mt-12">
+                    <ul class="space-y-4" id="nav-links">
+                        <li><a href="#summary" class="nav-link block font-medium text-slate-600 hover:text-indigo-600 transition-all duration-300">Summary</a></li>
+                        <li><a href="#skills" class="nav-link block font-medium text-slate-600 hover:text-indigo-600 transition-all duration-300">Skills</a></li>
+                        <li><a href="#experience" class="nav-link block font-medium text-slate-600 hover:text-indigo-600 transition-all duration-300">Experience</a></li>
+                        <li><a href="#projects" class="nav-link block font-medium text-slate-600 hover:text-indigo-600 transition-all duration-300">Projects</a></li>
+                        <li><a href="#education" class="nav-link block font-medium text-slate-600 hover:text-indigo-600 transition-all duration-300">Education</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="space-y-4">
+                <div class="flex space-x-4">
+                    <a href="https://github.com/apoorvanand" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-indigo-600 transition-colors" aria-label="GitHub Profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                    <a href="https://linkedin.com/in/apoorvanand" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-indigo-600 transition-colors" aria-label="LinkedIn Profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                    </a>
+                    <a href="https://twitter.com/apoorvanand" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-indigo-600 transition-colors" aria-label="Twitter Profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="text-sm text-slate-400">
+                    <p>&copy; 2025 Apoorv Anand</p>
+                    <p>Built with Tailwind & Chart.js</p>
+                    <p><a href="https://github.com/apoorvanand/apoorvanand.github.io" target="_blank" rel="noopener noreferrer" class="text-indigo-500 hover:text-indigo-700 transition-colors">View on GitHub</a></p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="w-full lg:w-3/4 p-6 sm:p-8 lg:p-16">
+            <!-- Header Section -->
+            <header class="mb-16 fade-in">
+                <h1 class="text-5xl sm:text-6xl font-extrabold text-slate-900 leading-tight">
+                    Hello, I'm <span class="text-indigo-600">Apoorv Anand</span>.
+                </h1>
+                <p class="text-xl sm:text-2xl text-slate-600 mt-4">I bridge the gap between complex technology and customer success.</p>
+                <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-slate-500">
+                    <span>Bengaluru, India</span>
+                    <span>•</span>
+                    <span>+91 7026814447</span>
+                    <span>•</span>
+                    <span>apoorv.anand7@icloud.com</span>
+                </div>
+            </header>
+
+            <!-- Summary Section -->
+            <section id="summary" class="mb-16 fade-in" style="animation-delay: 0.1s;">
+                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 pb-3 mb-6">About Me</h2>
+                <p class="text-lg text-slate-700 leading-relaxed">
+                    A results-oriented and adaptable technical professional with 2+ years of experience spanning customer-centric engineering, technical support, and full-stack web development. Proven ability to manage high-value client relationships, design effective technical solutions, and troubleshoot complex software and hardware challenges. I am passionate about leveraging my unique blend of deep product expertise, client advocacy, and hands-on development skills to drive customer success and product adoption.
+                </p>
+            </section>
+
+            <!-- Skills Section -->
+            <section id="skills" class="mb-16 fade-in" style="animation-delay: 0.2s;">
+                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 pb-3 mb-6">Core Competencies</h2>
+                <p class="text-lg text-slate-700 leading-relaxed mb-8">This section provides a visual and detailed breakdown of my capabilities. The radar chart highlights the balance between my client-facing and technical development skills, offering a quick overview of my core strengths. Below, you'll find a more granular look at the specific technologies and tools I work with, demonstrating my hands-on proficiency in each area.</p>
+                
+                <!-- Skill Categories Navigation -->
+                <div class="flex flex-wrap gap-4 mb-8">
+                    <button class="skill-tab active px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full font-medium hover:bg-indigo-200 transition" data-target="all">All Skills</button>
+                    <button class="skill-tab px-4 py-2 bg-slate-100 text-slate-700 rounded-full font-medium hover:bg-indigo-100 hover:text-indigo-700 transition" data-target="frontend">Frontend</button>
+                    <button class="skill-tab px-4 py-2 bg-slate-100 text-slate-700 rounded-full font-medium hover:bg-indigo-100 hover:text-indigo-700 transition" data-target="backend">Backend</button>
+                    <button class="skill-tab px-4 py-2 bg-slate-100 text-slate-700 rounded-full font-medium hover:bg-indigo-100 hover:text-indigo-700 transition" data-target="tools">Tools & Platforms</button>
+                    <button class="skill-tab px-4 py-2 bg-slate-100 text-slate-700 rounded-full font-medium hover:bg-indigo-100 hover:text-indigo-700 transition" data-target="soft">Soft Skills</button>
+                </div>
+                
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-12 items-center">
+                    <div class="chart-container">
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                        <!-- Frontend Skill Card -->
+                        <div class="space-y-4 skill-category" data-category="frontend">
+                            <h3 class="text-xl font-semibold text-indigo-700 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                                Frontend Development
+                            </h3>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">React.js</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">90%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 90%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">JavaScript (ES6+)</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">95%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 95%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">HTML5 & CSS3 / Tailwind</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">95%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 95%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">Responsive Design</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">90%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 90%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">UI/UX Principles</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">85%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 85%"></div></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Backend Skill Card -->
+                        <div class="space-y-4 skill-category" data-category="backend">
+                            <h3 class="text-xl font-semibold text-indigo-700 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                                </svg>
+                                Backend Development
+                            </h3>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">Python</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">80%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 80%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">Node.js / Express</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">70%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 70%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">REST APIs</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">85%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 85%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">SQL / NoSQL Databases</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">75%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 75%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">Blockchain / Solidity</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">75%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 75%"></div></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tools & Platforms Skill Card -->
+                        <div class="space-y-4 skill-category" data-category="tools">
+                            <h3 class="text-xl font-semibold text-indigo-700 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                                </svg>
+                                Tools & Platforms
+                            </h3>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">Git & GitHub</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">90%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 90%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">CI/CD Pipelines</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">70%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 70%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">Docker</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">65%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 65%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">AWS / Cloud Services</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">60%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 60%"></div></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Soft Skills Card -->
+                        <div class="space-y-4 skill-category" data-category="soft">
+                            <h3 class="text-xl font-semibold text-indigo-700 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                                </svg>
+                                Soft Skills
+                            </h3>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">Technical Problem Solving</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">95%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 95%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">Client Communication</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">90%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 90%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">Team Collaboration</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">85%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 85%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-medium">Technical Documentation</p>
+                                    <span class="text-sm text-indigo-600 font-semibold">85%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 85%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skill Badges -->
+                <div class="mt-12">
+                    <h3 class="text-xl font-semibold text-indigo-700 mb-4">Technologies & Tools</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">React.js</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">JavaScript</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">HTML5</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">CSS3</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Tailwind CSS</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Python</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Node.js</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Express</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">MongoDB</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">SQL</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Git</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">GitHub</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">REST APIs</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Solidity</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Docker</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">AWS</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">CI/CD</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Experience Section -->
+            <section id="experience" class="mb-16 fade-in" style="animation-delay: 0.3s;">
+                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 pb-3 mb-8">Career Journey</h2>
+                <p class="text-lg text-slate-700 leading-relaxed mb-8">My professional experience showcases a clear and rapid progression in responsibility and technical scope. The interactive timeline below details my journey at HP Inc., from mastering product-specific support to managing the entire commercial PC portfolio for all named accounts in India. Click on each role to expand and see the key achievements that defined each stage of my growth.</p>
+                <div class="relative pl-8 border-l-4 border-slate-200">
+                    <!-- Timeline Items will be dynamically handled for interaction -->
+                    <div class="mb-12 timeline-item">
+                        <div class="cursor-pointer" onclick="toggleDetails('details-1')">
+                            <h3 class="text-2xl font-semibold text-slate-800 hover:text-indigo-600 transition">Senior Technical Support Engineer (Team Cheetah)</h3>
+                            <p class="text-md text-slate-500">HP Inc. | Apr 2025 – Present</p>
+                        </div>
+                        <div id="details-1" class="details-content mt-4 text-slate-600 space-y-2">
+                             <ul class="list-disc list-inside space-y-2">
+                                <li>Selected for an elite team to serve as the lead technical advisor for all of HP's named commercial PC accounts across the Indian market.</li>
+                                <li>Owns the most complex technical escalations for the entire PC product portfolio, driving resolution to ensure high-stakes client retention and business continuity.</li>
+                                <li>Collaborates directly with Level 3 engineering and product management to investigate and document complex bugs.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                     <div class="mb-12 timeline-item">
+                        <div class="cursor-pointer" onclick="toggleDetails('details-2')">
+                            <h3 class="text-2xl font-semibold text-slate-800 hover:text-indigo-600 transition">Technical Support Engineer II</h3>
+                            <p class="text-md text-slate-500">HP Inc. | Jul 2024 – Apr 2025</p>
+                        </div>
+                        <div id="details-2" class="details-content mt-4 text-slate-600 space-y-2">
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>Managed relationships with key commercial printer accounts like HDFC, SBI, and Bank of Baroda.</li>
+                                <li>Led remote resolution initiatives, improving team efficiency by 25%.</li>
+                                <li>Mentored 5 junior engineers, improving team-wide FCR by 15%.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-12 timeline-item">
+                        <div class="cursor-pointer" onclick="toggleDetails('details-3')">
+                            <h3 class="text-2xl font-semibold text-slate-800 hover:text-indigo-600 transition">Technical Support Engineer I</h3>
+                            <p class="text-md text-slate-500">HP Inc. | Dec 2022 – Jul 2024</p>
+                        </div>
+                        <div id="details-3" class="details-content mt-4 text-slate-600 space-y-2">
+                             <ul class="list-disc list-inside space-y-2">
+                                <li>Served as the primary technical expert for HP's commercial printer line for major enterprise clients.</li>
+                                <li>Performed detailed root cause analysis on client-reported issues, maintaining a high remote resolution rate.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                     <div class="mb-12 timeline-item">
+                        <div class="cursor-pointer" onclick="toggleDetails('details-4')">
+                            <h3 class="text-2xl font-semibold text-slate-800 hover:text-indigo-600 transition">Web3 Developer</h3>
+                            <p class="text-md text-slate-500">Myriad | Jul 2022 – Dec 2022</p>
+                        </div>
+                        <div id="details-4" class="details-content mt-4 text-slate-600 space-y-2">
+                             <ul class="list-disc list-inside space-y-2">
+                                <li>Developed responsive front-end components for dApps using React.js.</li>
+                                <li>Authored and deployed Solidity smart contracts, demonstrating full-stack development capability.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Projects Section -->
+            <section id="projects" class="mb-16 fade-in" style="animation-delay: 0.4s;">
+                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 pb-3 mb-6">Personal Projects</h2>
+                <p class="text-lg text-slate-700 leading-relaxed mb-8">These projects showcase my ability to apply technical skills to solve real-world problems. Each project demonstrates different aspects of my development capabilities and problem-solving approach.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Project Card 1 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-semibold text-indigo-700">Dev-Support Knowledge Base</h3>
+                            <span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs font-medium">In Progress</span>
+                        </div>
+                        <p class="text-slate-600 mb-4 flex-grow">A full-stack application built with React and a Python (Flask) backend to create a searchable knowledge base. A tangible example of how I bridge the gap between technical implementation and user-centric problem-solving for support teams.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">React</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Python</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Flask</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">MongoDB</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <a href="https://github.com/apoorvanand" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                </svg>
+                                GitHub
+                            </a>
+                            <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+                                </svg>
+                                Demo (Coming Soon)
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Card 2 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-semibold text-indigo-700">Smart Contract Marketplace</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Completed</span>
+                        </div>
+                        <p class="text-slate-600 mb-4 flex-grow">A decentralized marketplace built on Ethereum that allows users to list, buy, and sell digital assets. Implemented smart contracts with Solidity and created a responsive frontend with React and Web3.js.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Solidity</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">React</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Web3.js</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Ethereum</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <a href="https://github.com/apoorvanand" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                </svg>
+                                GitHub
+                            </a>
+                            <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+                                </svg>
+                                Demo
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Card 3 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-semibold text-indigo-700">Technical Support Dashboard</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Completed</span>
+                        </div>
+                        <p class="text-slate-600 mb-4 flex-grow">An internal tool developed to streamline technical support workflows. Features include case tracking, knowledge base integration, and performance analytics. Reduced average case resolution time by 30%.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">JavaScript</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Node.js</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Express</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">MongoDB</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <a href="https://github.com/apoorvanand" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                </svg>
+                                Private Repo
+                            </a>
+                            <span class="text-slate-500 text-sm">Internal Use Only</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Card 4 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-semibold text-indigo-700">Interactive Portfolio</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Completed</span>
+                        </div>
+                        <p class="text-slate-600 mb-4 flex-grow">This very portfolio website! A responsive, interactive resume built with modern web technologies. Features include interactive charts, smooth animations, and a clean, professional design.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">HTML5</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Tailwind CSS</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">JavaScript</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Chart.js</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <a href="https://github.com/apoorvanand" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                </svg>
+                                GitHub
+                            </a>
+                            <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+                                </svg>
+                                Live Site
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Education Section -->
+            <section id="education" class="mb-16 fade-in" style="animation-delay: 0.4s;">
+                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 pb-3 mb-6">Education</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h3 class="text-xl font-semibold text-indigo-700">B.Tech, Computer Science & Engineering</h3>
+                    <p class="text-slate-500">MIT-WPU, Pune (2022)</p>
+                    <p class="mt-4 text-slate-600">Ongoing learning in Data Science, Machine Learning, and CompTIA Security+.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function toggleDetails(id) {
+            const allDetails = document.querySelectorAll('.details-content');
+            allDetails.forEach(el => {
+                if (el.id !== id) {
+                    el.classList.remove('open');
+                }
+            });
+            document.getElementById(id).classList.toggle('open');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Radar Chart
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            const skillsChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Client Engineering', 'Frontend Dev', 'Backend Dev', 'Web3', 'Problem Solving', 'Platform Tools'],
+                    datasets: [{
+                        label: 'Skill Area Balance',
+                        data: [9, 8.5, 7, 7.5, 9.5, 8],
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        pointBackgroundColor: 'rgba(79, 70, 229, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(79, 70, 229, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(30, 41, 59, 0.2)' },
+                            grid: { color: 'rgba(30, 41, 59, 0.2)' },
+                            pointLabels: { 
+                                font: { size: 14, weight: '600' },
+                                color: '#334155'
+                            },
+                            ticks: {
+                                backdropColor: 'rgba(248, 250, 252, 0)',
+                                color: '#64748b',
+                                stepSize: 2
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.raw}/10`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Skills Category Filter
+            const skillTabs = document.querySelectorAll('.skill-tab');
+            const skillCategories = document.querySelectorAll('.skill-category');
+            
+            skillTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Update active tab styling
+                    skillTabs.forEach(t => {
+                        t.classList.remove('active', 'bg-indigo-100', 'text-indigo-700');
+                        t.classList.add('bg-slate-100', 'text-slate-700');
+                    });
+                    tab.classList.add('active', 'bg-indigo-100', 'text-indigo-700');
+                    tab.classList.remove('bg-slate-100', 'text-slate-700');
+                    
+                    const target = tab.getAttribute('data-target');
+                    
+                    // Show/hide skill categories based on selection
+                    if (target === 'all') {
+                        skillCategories.forEach(category => {
+                            category.style.display = 'block';
+                        });
+                    } else {
+                        skillCategories.forEach(category => {
+                            if (category.getAttribute('data-category') === target) {
+                                category.style.display = 'block';
+                            } else {
+                                category.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Animate progress bars on scroll
+            const animateProgressBars = () => {
+                const progressBars = document.querySelectorAll('.progress-bar-fill');
+                progressBars.forEach(bar => {
+                    const rect = bar.getBoundingClientRect();
+                    if (rect.top < window.innerHeight && rect.bottom > 0) {
+                        const width = bar.style.width;
+                        bar.style.width = '0%';
+                        setTimeout(() => {
+                            bar.style.width = width;
+                        }, 100);
+                    }
+                });
+            };
+
+            // Navigation highlighting on scroll
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.4
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Animate progress bars when skills section is visible
+                        if (entry.target.id === 'skills') {
+                            animateProgressBars();
+                        }
+                        
+                        // Update active navigation link
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Initialize with first timeline item expanded
+            toggleDetails('details-1');
+        });
+    </script>
+</body>
+</html>
+
