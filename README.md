@@ -1,6 +1,6 @@
 # Apoorv Anand - Interactive Portfolio
 
-🚀 **Live Demo**: [https://apoorvanand.github.io](https://apoorvanand.github.io)
+🚀 **Live Demo**: [https://akai07.github.io/apoorvanand.github.io](https://akai07.github.io/apoorvanand.github.io)
 
 ## Overview
 
