@@ -56,22 +56,71 @@
     }
     </script>
     
-    <script src="https://cdn.tailwindcss.com" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <!-- DNS prefetch for external domains -->
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Preload critical resources -->
     <link rel="preload" as="script" href="https://cdn.tailwindcss.com">
     <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/chart.js">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    
+    <!-- Load fonts with optimal display strategy -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+    
+    <!-- Load scripts with optimal loading strategy -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <!-- Chosen Palette: Modern Tech (Slate, with Indigo accent) -->
     <!-- Application Structure Plan: Retains the single-page vertical scroll with a fixed sidebar for usability. The core change is a visual and interactive upgrade. The skills section is transformed from a simple chart into an impressive radar chart for categorical skill comparison and detailed progress bars for specific technologies. This structure is better for a portfolio as it visually emphasizes technical proficiency in a more granular and modern way, immediately showing strengths to a recruiter. -->
     <!-- Visualization & Content Choices: 1. Skills Balance -> Goal: Compare/Organize -> Viz: Radar Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. Justification: A radar chart is more visually compelling and professional for showing balanced strengths across different domains (e.g., development vs. client-facing skills) than a doughnut chart. 2. Specific Skills -> Goal: Inform -> Viz: Animated Progress Bars (HTML/CSS) with Icons -> Interaction: Visual feedback on load/scroll. Justification: Provides a clean, scannable, and modern way to list individual tech skills, replacing a plain text list. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
+        /* Critical CSS for above-the-fold content */
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: #f8fafc; /* slate-50 */
             color: #1e293b; /* slate-800 */
+            line-height: 1.6;
+        }
+        
+        /* Optimize font loading */
+        .font-inter {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Lazy loading animation optimization */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Optimize animations for better performance */
+        .progress-bar {
+            will-change: width;
+        }
+        
+        /* Reduce layout shifts */
+        .chart-container {
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .timeline-item::before {
             content: '';
@@ -802,6 +851,67 @@
             
             // Initialize with first timeline item expanded
             toggleDetails('details-1');
+
+            // Lazy loading animations for performance
+            const lazyElements = document.querySelectorAll('.fade-in');
+            const lazyObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        lazyObserver.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '50px'
+            });
+
+            lazyElements.forEach(element => {
+                lazyObserver.observe(element);
+            });
+
+            // Optimize scroll performance with throttling
+            let scrollTimeout;
+            const optimizeScroll = () => {
+                if (scrollTimeout) {
+                    cancelAnimationFrame(scrollTimeout);
+                }
+                scrollTimeout = requestAnimationFrame(() => {
+                    // Scroll-based optimizations can be added here
+                });
+            };
+
+            window.addEventListener('scroll', optimizeScroll, { passive: true });
+
+            // Preload critical resources when idle
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                    // Preload any additional resources during idle time
+                    const link = document.createElement('link');
+                    link.rel = 'prefetch';
+                    link.href = './favicon.svg';
+                    document.head.appendChild(link);
+                });
+            }
+
+            // Register service worker for caching (if available)
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(registration => {
+                            console.log('SW registered: ', registration);
+                        })
+                        .catch(registrationError => {
+                            console.log('SW registration failed: ', registrationError);
+                        });
+                });
+            }
+
+            // Add fade-in classes to sections for lazy loading
+            const sectionsToAnimate = document.querySelectorAll('#about, #experience, #skills, #projects, #education, #contact');
+            sectionsToAnimate.forEach(section => {
+                section.classList.add('fade-in');
+            });
 
             // Mobile menu functionality
             const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
