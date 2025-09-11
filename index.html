@@ -71,6 +71,7 @@
     <!-- Preload critical resources -->
     <link rel="preload" as="script" href="https://cdn.tailwindcss.com">
     <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/chart.js">
+    <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     
     <!-- Load fonts with optimal display strategy -->
@@ -78,8 +79,22 @@
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
     
     <!-- Load scripts with optimal loading strategy -->
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#6366f1'
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
     <!-- Chosen Palette: Modern Tech (Slate, with Indigo accent) -->
     <!-- Application Structure Plan: Retains the single-page vertical scroll with a fixed sidebar for usability. The core change is a visual and interactive upgrade. The skills section is transformed from a simple chart into an impressive radar chart for categorical skill comparison and detailed progress bars for specific technologies. This structure is better for a portfolio as it visually emphasizes technical proficiency in a more granular and modern way, immediately showing strengths to a recruiter. -->
     <!-- Visualization & Content Choices: 1. Skills Balance -> Goal: Compare/Organize -> Viz: Radar Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips. Justification: A radar chart is more visually compelling and professional for showing balanced strengths across different domains (e.g., development vs. client-facing skills) than a doughnut chart. 2. Specific Skills -> Goal: Inform -> Viz: Animated Progress Bars (HTML/CSS) with Icons -> Interaction: Visual feedback on load/scroll. Justification: Provides a clean, scannable, and modern way to list individual tech skills, replacing a plain text list. -->
@@ -98,16 +113,270 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
-        /* Lazy loading animation optimization */
+        /* Advanced scroll-triggered animations */
         .fade-in {
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         
         .fade-in.visible {
             opacity: 1;
             transform: translateY(0);
+        }
+        
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .slide-in-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(60px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .slide-in-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .scale-in {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .scale-in.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .stagger-item {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .stagger-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Interactive cursor follower */
+        .cursor-follower {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.15s ease-out;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+        }
+        
+        .cursor-follower.hover {
+            width: 40px;
+            height: 40px;
+            background: rgba(99, 102, 241, 0.5);
+            border: 2px solid rgba(99, 102, 241, 0.8);
+        }
+        
+        .cursor-follower.click {
+            width: 60px;
+            height: 60px;
+            background: rgba(99, 102, 241, 0.7);
+        }
+        
+        /* Hide default cursor on interactive elements */
+        a, button, .nav-link, .mobile-nav-link {
+            cursor: none;
+        }
+        
+        /* Dynamic navigation indicator */
+        .nav-indicator {
+            position: absolute;
+            left: -12px;
+            width: 4px;
+            height: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            opacity: 0;
+            transform: translateY(-50%);
+        }
+        
+        .nav-indicator.active {
+            opacity: 1;
+            height: 32px;
+        }
+        
+        /* Navigation container positioning */
+        #nav-links {
+            position: relative;
+        }
+        
+        /* Enhanced nav link styles */
+        .nav-link {
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .nav-link.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: #667eea !important;
+            transform: translateX(8px);
+        }
+        
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.05);
+            transform: translateX(4px);
+        }
+        
+        /* Animated gradient text effect */
+        .gradient-text {
+            background: linear-gradient(
+                45deg,
+                #667eea,
+                #764ba2,
+                #f093fb,
+                #f5576c,
+                #4facfe,
+                #00f2fe
+            );
+            background-size: 400% 400%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            25% {
+                background-position: 100% 50%;
+            }
+            50% {
+                background-position: 100% 100%;
+            }
+            75% {
+                background-position: 0% 100%;
+            }
+        }
+        
+        /* Gradient text hover effect */
+        .gradient-text:hover {
+            animation-duration: 2s;
+        }
+        
+        /* Dark mode gradient text */
+        .dark .gradient-text {
+            background: linear-gradient(
+                45deg,
+                #a78bfa,
+                #c084fc,
+                #fb7185,
+                #fbbf24,
+                #34d399,
+                #60a5fa
+            );
+            background-size: 400% 400%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Custom scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
+            transform: scale(1.1);
+        }
+        
+        /* Dark mode scrollbar */
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(51, 65, 85, 0.3);
+        }
+        
+        .dark ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #a78bfa, #c084fc);
+        }
+        
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        }
+        
+        /* Enhanced responsive design */
+        @media (max-width: 1024px) {
+            .cursor-follower {
+                display: none;
+            }
+            
+            .nav-indicator {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .gradient-text {
+                background-size: 200% 200%;
+                animation-duration: 4s;
+            }
+            
+            .fade-in, .slide-in-left, .slide-in-right, .scale-in {
+                transform: none;
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .stagger-item {
+                transform: none;
+                opacity: 1;
+            }
+            
+            .chart-container {
+                min-height: 200px;
+            }
+        }
+        
+        /* Performance optimizations */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .cursor-follower {
+                display: none;
+            }
         }
         
         /* Optimize animations for better performance */
@@ -181,11 +450,11 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
 
     <!-- Mobile Navigation Toggle -->
     <div class="lg:hidden fixed top-4 left-4 z-50">
-        <button id="mobile-menu-toggle" class="bg-white p-3 rounded-lg shadow-lg border border-slate-200 hover:bg-slate-50 transition-colors" aria-label="Toggle navigation menu">
+        <button id="mobile-menu-toggle" class="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" aria-label="Toggle navigation menu">
             <svg class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
@@ -194,10 +463,10 @@
 
     <!-- Mobile Navigation Menu -->
     <div id="mobile-menu" class="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50 hidden">
-        <div class="bg-white w-80 h-full p-8 transform -translate-x-full transition-transform duration-300 ease-in-out" id="mobile-menu-content">
+        <div class="bg-white dark:bg-slate-800 w-80 h-full p-8 transform -translate-x-full transition-transform duration-300 ease-in-out" id="mobile-menu-content">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-2xl font-bold text-indigo-600">Apoorv Anand</h2>
-                <button id="mobile-menu-close" class="text-slate-600 hover:text-slate-900" aria-label="Close navigation menu">
+                <button id="mobile-menu-close" class="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100" aria-label="Close navigation menu">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -205,26 +474,26 @@
             </div>
             <nav>
                 <ul class="space-y-6">
-                    <li><a href="#summary" class="mobile-nav-link block text-lg font-medium text-slate-600 hover:text-indigo-600 transition-colors">Summary</a></li>
-                    <li><a href="#skills" class="mobile-nav-link block text-lg font-medium text-slate-600 hover:text-indigo-600 transition-colors">Skills</a></li>
-                    <li><a href="#experience" class="mobile-nav-link block text-lg font-medium text-slate-600 hover:text-indigo-600 transition-colors">Experience</a></li>
-                    <li><a href="#projects" class="mobile-nav-link block text-lg font-medium text-slate-600 hover:text-indigo-600 transition-colors">Projects</a></li>
-                    <li><a href="#education" class="mobile-nav-link block text-lg font-medium text-slate-600 hover:text-indigo-600 transition-colors">Education</a></li>
+                    <li><a href="#summary" class="mobile-nav-link block text-lg font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors">Summary</a></li>
+                    <li><a href="#skills" class="mobile-nav-link block text-lg font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors">Skills</a></li>
+                    <li><a href="#experience" class="mobile-nav-link block text-lg font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors">Experience</a></li>
+                    <li><a href="#projects" class="mobile-nav-link block text-lg font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors">Projects</a></li>
+                    <li><a href="#education" class="mobile-nav-link block text-lg font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors">Education</a></li>
                 </ul>
             </nav>
             <div class="mt-12 space-y-4">
                 <div class="flex space-x-4">
-                    <a href="https://github.com/apoorvanand" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-indigo-600 transition-colors" aria-label="GitHub Profile">
+                    <a href="https://github.com/apoorvanand" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors" aria-label="GitHub Profile">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                         </svg>
                     </a>
-                    <a href="https://linkedin.com/in/apoorvanand" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-indigo-600 transition-colors" aria-label="LinkedIn Profile">
+                    <a href="https://linkedin.com/in/apoorvanand" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors" aria-label="LinkedIn Profile">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                         </svg>
                     </a>
-                    <a href="https://twitter.com/apoorvanand" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-indigo-600 transition-colors" aria-label="Twitter Profile">
+                    <a href="https://twitter.com/apoorvanand" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors" aria-label="Twitter Profile">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
                         </svg>
@@ -236,17 +505,36 @@
 
     <div class="flex min-h-screen">
         <!-- Sidebar Navigation -->
-        <aside class="w-1/4 bg-white border-r border-slate-200 p-8 sticky top-0 h-screen hidden lg:flex flex-col justify-between">
+        <aside class="w-1/5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50 p-6 sticky top-0 h-screen hidden lg:flex flex-col justify-between transition-all duration-300 shadow-xl slide-in-left">
             <div>
-                <h2 class="text-2xl font-bold text-indigo-600">Apoorv Anand</h2>
-                <p class="text-sm text-slate-500">Technical Solutions Professional</p>
+                <!-- Profile Photo -->
+                <div class="mb-6">
+                    <div class="w-full h-32 rounded-lg overflow-hidden border-4 border-white/90 dark:border-white/30 shadow-xl bg-white/95 dark:bg-white/15 backdrop-blur-sm">
+                        <img src="./IMG_6858.JPEG" alt="Apoorv Anand Profile Photo" class="w-full h-full object-cover mix-blend-multiply dark:mix-blend-screen opacity-95 dark:opacity-85" loading="lazy">
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold text-indigo-600 text-center">Apoorv Anand</h2>
+                <p class="text-sm text-slate-500 text-center">Technical Solutions Professional</p>
+                <!-- Theme Toggle Button -->
+                <div class="mt-8">
+                    <button id="theme-toggle" class="flex items-center justify-center w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-full hover:bg-slate-200 dark:hover:bg-slate-600 transition-all duration-300 group" aria-label="Toggle theme">
+                        <svg id="sun-icon" class="w-6 h-6 text-yellow-500 transition-all duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                        </svg>
+                        <svg id="moon-icon" class="w-6 h-6 text-slate-400 transition-all duration-300 group-hover:scale-110 hidden" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                        </svg>
+                    </button>
+                </div>
+                
                 <nav class="mt-12">
                     <ul class="space-y-4" id="nav-links">
-                        <li><a href="#summary" class="nav-link block font-medium text-slate-600 hover:text-indigo-600 transition-all duration-300">Summary</a></li>
-                        <li><a href="#skills" class="nav-link block font-medium text-slate-600 hover:text-indigo-600 transition-all duration-300">Skills</a></li>
-                        <li><a href="#experience" class="nav-link block font-medium text-slate-600 hover:text-indigo-600 transition-all duration-300">Experience</a></li>
-                        <li><a href="#projects" class="nav-link block font-medium text-slate-600 hover:text-indigo-600 transition-all duration-300">Projects</a></li>
-                        <li><a href="#education" class="nav-link block font-medium text-slate-600 hover:text-indigo-600 transition-all duration-300">Education</a></li>
+                        <div class="nav-indicator" id="nav-indicator"></div>
+                        <li><a href="#summary" class="nav-link block font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300">Summary</a></li>
+                        <li><a href="#skills" class="nav-link block font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300">Skills</a></li>
+                        <li><a href="#experience" class="nav-link block font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300">Experience</a></li>
+                        <li><a href="#projects" class="nav-link block font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300">Projects</a></li>
+                        <li><a href="#education" class="nav-link block font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300">Education</a></li>
                     </ul>
                 </nav>
             </div>
@@ -277,13 +565,15 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="w-full lg:w-3/4 p-6 sm:p-8 lg:p-16">
+        <main class="w-full lg:w-4/5 p-6 sm:p-8 lg:p-16 relative">
+            <!-- 3D Background Canvas -->
+            <canvas id="three-bg" class="absolute inset-0 w-full h-full pointer-events-none opacity-30 hidden lg:block"></canvas>
             <!-- Header Section -->
-            <header class="mb-16 fade-in">
-                <h1 class="text-5xl sm:text-6xl font-extrabold text-slate-900 leading-tight">
-                    Hello, I'm <span class="text-indigo-600">Apoorv Anand</span>.
+            <header class="mb-16 fade-in relative z-10">
+                <h1 class="text-5xl sm:text-6xl font-extrabold text-slate-900 dark:text-slate-100 leading-tight">
+                    Hello, I'm <span class="gradient-text">Apoorv Anand</span>.
                 </h1>
-                <p class="text-xl sm:text-2xl text-slate-600 mt-4">I bridge the gap between complex technology and customer success.</p>
+                <p class="text-xl sm:text-2xl text-slate-800 dark:text-slate-200 mt-4 font-medium">I bridge the gap between complex technology and customer success.</p>
                 <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-slate-500">
                     <span>Bengaluru, India</span>
                     <span>•</span>
@@ -294,25 +584,25 @@
             </header>
 
             <!-- Summary Section -->
-            <section id="summary" class="mb-16 fade-in" style="animation-delay: 0.1s;">
-                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 pb-3 mb-6">About Me</h2>
-                <p class="text-lg text-slate-700 leading-relaxed">
+            <section id="summary" class="mb-16 fade-in relative z-10 bg-white/60 dark:bg-slate-800/60 backdrop-blur-lg rounded-2xl p-8 border border-slate-200/30 dark:border-slate-700/30 shadow-xl" style="animation-delay: 0.1s;">
+                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 dark:border-indigo-400/50 pb-3 mb-6 text-slate-900 dark:text-slate-100">About Me</h2>
+                <p class="text-lg text-slate-900 dark:text-slate-100 leading-relaxed font-medium">
                     A results-oriented and adaptable technical professional with 2+ years of experience spanning customer-centric engineering, technical support, and full-stack web development. Proven ability to manage high-value client relationships, design effective technical solutions, and troubleshoot complex software and hardware challenges. I am passionate about leveraging my unique blend of deep product expertise, client advocacy, and hands-on development skills to drive customer success and product adoption.
                 </p>
             </section>
 
             <!-- Skills Section -->
-            <section id="skills" class="mb-16 fade-in" style="animation-delay: 0.2s;">
-                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 pb-3 mb-6">Core Competencies</h2>
-                <p class="text-lg text-slate-700 leading-relaxed mb-8">This section provides a visual and detailed breakdown of my capabilities. The radar chart highlights the balance between my client-facing and technical development skills, offering a quick overview of my core strengths. Below, you'll find a more granular look at the specific technologies and tools I work with, demonstrating my hands-on proficiency in each area.</p>
+            <section id="skills" class="mb-16 fade-in relative z-10 bg-white/60 dark:bg-slate-800/60 backdrop-blur-lg rounded-2xl p-8 border border-slate-200/30 dark:border-slate-700/30 shadow-xl" style="animation-delay: 0.2s;">
+                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 dark:border-indigo-400/50 pb-3 mb-6 text-slate-900 dark:text-slate-100">Core Competencies</h2>
+                <p class="text-lg text-slate-900 dark:text-slate-100 leading-relaxed mb-8 font-medium">This section provides a visual and detailed breakdown of my capabilities. The radar chart highlights the balance between my client-facing and technical development skills, offering a quick overview of my core strengths. Below, you'll find a more granular look at the specific technologies and tools I work with, demonstrating my hands-on proficiency in each area.</p>
                 
                 <!-- Skill Categories Navigation -->
                 <div class="flex flex-wrap gap-4 mb-8">
                     <button class="skill-tab active px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full font-medium hover:bg-indigo-200 transition" data-target="all">All Skills</button>
-                    <button class="skill-tab px-4 py-2 bg-slate-100 text-slate-700 rounded-full font-medium hover:bg-indigo-100 hover:text-indigo-700 transition" data-target="frontend">Frontend</button>
-                    <button class="skill-tab px-4 py-2 bg-slate-100 text-slate-700 rounded-full font-medium hover:bg-indigo-100 hover:text-indigo-700 transition" data-target="backend">Backend</button>
-                    <button class="skill-tab px-4 py-2 bg-slate-100 text-slate-700 rounded-full font-medium hover:bg-indigo-100 hover:text-indigo-700 transition" data-target="tools">Tools & Platforms</button>
-                    <button class="skill-tab px-4 py-2 bg-slate-100 text-slate-700 rounded-full font-medium hover:bg-indigo-100 hover:text-indigo-700 transition" data-target="soft">Soft Skills</button>
+                    <button class="skill-tab px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full font-medium hover:bg-indigo-100 dark:hover:bg-indigo-800 hover:text-indigo-700 dark:hover:text-indigo-300 transition" data-target="frontend">Frontend</button>
+                <button class="skill-tab px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full font-medium hover:bg-indigo-100 dark:hover:bg-indigo-800 hover:text-indigo-700 dark:hover:text-indigo-300 transition" data-target="backend">Backend</button>
+                <button class="skill-tab px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full font-medium hover:bg-indigo-100 dark:hover:bg-indigo-800 hover:text-indigo-700 dark:hover:text-indigo-300 transition" data-target="tools">Tools & Platforms</button>
+                <button class="skill-tab px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full font-medium hover:bg-indigo-100 dark:hover:bg-indigo-800 hover:text-indigo-700 dark:hover:text-indigo-300 transition" data-target="soft">Soft Skills</button>
                 </div>
                 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-12 items-center">
@@ -328,21 +618,21 @@
                                 </svg>
                                 Frontend Development
                             </h3>
-                            <div class="skill-item">
+                            <div class="skill-item stagger-item">
                                 <div class="flex justify-between mb-1">
                                     <p class="font-medium">React.js</p>
                                     <span class="text-sm text-indigo-600 font-semibold">90%</span>
                                 </div>
                                 <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 90%"></div></div>
                             </div>
-                            <div class="skill-item">
+                            <div class="skill-item stagger-item">
                                 <div class="flex justify-between mb-1">
                                     <p class="font-medium">JavaScript (ES6+)</p>
                                     <span class="text-sm text-indigo-600 font-semibold">95%</span>
                                 </div>
                                 <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="progress-bar-fill bg-indigo-500 h-2.5 rounded-full" style="width: 95%"></div></div>
                             </div>
-                            <div class="skill-item">
+                            <div class="skill-item stagger-item">
                                 <div class="flex justify-between mb-1">
                                     <p class="font-medium">HTML5 & CSS3 / Tailwind</p>
                                     <span class="text-sm text-indigo-600 font-semibold">95%</span>
@@ -514,17 +804,17 @@
             </section>
 
             <!-- Experience Section -->
-            <section id="experience" class="mb-16 fade-in" style="animation-delay: 0.3s;">
-                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 pb-3 mb-8">Career Journey</h2>
-                <p class="text-lg text-slate-700 leading-relaxed mb-8">My professional experience showcases a clear and rapid progression in responsibility and technical scope. The interactive timeline below details my journey at HP Inc., from mastering product-specific support to managing the entire commercial PC portfolio for all named accounts in India. Click on each role to expand and see the key achievements that defined each stage of my growth.</p>
-                <div class="relative pl-8 border-l-4 border-slate-200">
+            <section id="experience" class="mb-16 fade-in relative z-10 bg-white/60 dark:bg-slate-800/60 backdrop-blur-lg rounded-2xl p-8 border border-slate-200/30 dark:border-slate-700/30 shadow-xl" style="animation-delay: 0.3s;">
+                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 dark:border-indigo-400/50 pb-3 mb-8 text-slate-900 dark:text-slate-100">Career Journey</h2>
+                <p class="text-lg text-slate-900 dark:text-slate-100 leading-relaxed mb-8 font-medium">My professional experience showcases a clear and rapid progression in responsibility and technical scope. The interactive timeline below details my journey at HP Inc., from mastering product-specific support to managing the entire commercial PC portfolio for all named accounts in India. Click on each role to expand and see the key achievements that defined each stage of my growth.</p>
+                <div class="relative pl-8 border-l-4 border-slate-200 dark:border-slate-600">
                     <!-- Timeline Items will be dynamically handled for interaction -->
                     <div class="mb-12 timeline-item">
                         <div class="cursor-pointer" onclick="toggleDetails('details-1')">
-                            <h3 class="text-2xl font-semibold text-slate-800 hover:text-indigo-600 transition">Senior Technical Support Engineer (Team Cheetah)</h3>
-                            <p class="text-md text-slate-500">HP Inc. | Apr 2025 – Present</p>
+                            <h3 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Senior Technical Support Engineer (Team Cheetah)</h3>
+                            <p class="text-md text-slate-500 dark:text-slate-400">HP Inc. | Apr 2025 – Present</p>
                         </div>
-                        <div id="details-1" class="details-content mt-4 text-slate-600 space-y-2">
+                        <div id="details-1" class="details-content mt-4 text-slate-600 dark:text-slate-300 space-y-2">
                              <ul class="list-disc list-inside space-y-2">
                                 <li>Selected for an elite team to serve as the lead technical advisor for all of HP's named commercial PC accounts across the Indian market.</li>
                                 <li>Owns the most complex technical escalations for the entire PC product portfolio, driving resolution to ensure high-stakes client retention and business continuity.</li>
@@ -535,10 +825,10 @@
 
                      <div class="mb-12 timeline-item">
                         <div class="cursor-pointer" onclick="toggleDetails('details-2')">
-                            <h3 class="text-2xl font-semibold text-slate-800 hover:text-indigo-600 transition">Technical Support Engineer II</h3>
-                            <p class="text-md text-slate-500">HP Inc. | Jul 2024 – Apr 2025</p>
+                            <h3 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Technical Support Engineer II</h3>
+                            <p class="text-md text-slate-500 dark:text-slate-400">HP Inc. | Jul 2024 – Apr 2025</p>
                         </div>
-                        <div id="details-2" class="details-content mt-4 text-slate-600 space-y-2">
+                        <div id="details-2" class="details-content mt-4 text-slate-800 dark:text-slate-200 space-y-2 font-medium">
                             <ul class="list-disc list-inside space-y-2">
                                 <li>Managed relationships with key commercial printer accounts like HDFC, SBI, and Bank of Baroda.</li>
                                 <li>Led remote resolution initiatives, improving team efficiency by 25%.</li>
@@ -549,10 +839,10 @@
                     
                     <div class="mb-12 timeline-item">
                         <div class="cursor-pointer" onclick="toggleDetails('details-3')">
-                            <h3 class="text-2xl font-semibold text-slate-800 hover:text-indigo-600 transition">Technical Support Engineer I</h3>
-                            <p class="text-md text-slate-500">HP Inc. | Dec 2022 – Jul 2024</p>
+                            <h3 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Technical Support Engineer I</h3>
+                            <p class="text-md text-slate-500 dark:text-slate-400">HP Inc. | Dec 2022 – Jul 2024</p>
                         </div>
-                        <div id="details-3" class="details-content mt-4 text-slate-600 space-y-2">
+                        <div id="details-3" class="details-content mt-4 text-slate-800 dark:text-slate-200 space-y-2 font-medium">
                              <ul class="list-disc list-inside space-y-2">
                                 <li>Served as the primary technical expert for HP's commercial printer line for major enterprise clients.</li>
                                 <li>Performed detailed root cause analysis on client-reported issues, maintaining a high remote resolution rate.</li>
@@ -562,10 +852,10 @@
 
                      <div class="mb-12 timeline-item">
                         <div class="cursor-pointer" onclick="toggleDetails('details-4')">
-                            <h3 class="text-2xl font-semibold text-slate-800 hover:text-indigo-600 transition">Web3 Developer</h3>
-                            <p class="text-md text-slate-500">Myriad | Jul 2022 – Dec 2022</p>
+                            <h3 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Web3 Developer</h3>
+                            <p class="text-md text-slate-500 dark:text-slate-400">Myriad | Jul 2022 – Dec 2022</p>
                         </div>
-                        <div id="details-4" class="details-content mt-4 text-slate-600 space-y-2">
+                        <div id="details-4" class="details-content mt-4 text-slate-800 dark:text-slate-200 space-y-2 font-medium">
                              <ul class="list-disc list-inside space-y-2">
                                 <li>Developed responsive front-end components for dApps using React.js.</li>
                                 <li>Authored and deployed Solidity smart contracts, demonstrating full-stack development capability.</li>
@@ -576,23 +866,23 @@
             </section>
             
             <!-- Projects Section -->
-            <section id="projects" class="mb-16 fade-in" style="animation-delay: 0.4s;">
-                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 pb-3 mb-6">Personal Projects</h2>
-                <p class="text-lg text-slate-700 leading-relaxed mb-8">These projects showcase my ability to apply technical skills to solve real-world problems. Each project demonstrates different aspects of my development capabilities and problem-solving approach.</p>
+            <section id="projects" class="mb-16 fade-in relative z-10 bg-white/60 dark:bg-slate-800/60 backdrop-blur-lg rounded-2xl p-8 border border-slate-200/30 dark:border-slate-700/30 shadow-xl" style="animation-delay: 0.4s;">
+                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 dark:border-indigo-400/50 pb-3 mb-6 text-slate-900 dark:text-slate-100">Personal Projects</h2>
+                <p class="text-lg text-slate-900 dark:text-slate-100 leading-relaxed mb-8 font-medium">These projects showcase my ability to apply technical skills to solve real-world problems. Each project demonstrates different aspects of my development capabilities and problem-solving approach.</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Project Card 1 -->
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+                    <div class="bg-white/70 dark:bg-slate-700/70 backdrop-blur-md p-6 rounded-xl shadow-lg border border-indigo-200/40 dark:border-indigo-400/40 hover:shadow-xl hover:border-indigo-300/60 dark:hover:border-indigo-300/60 transition-all duration-300 flex flex-col h-full scale-in">
                         <div class="flex justify-between items-start mb-4">
                             <h3 class="text-xl font-semibold text-indigo-700">Dev-Support Knowledge Base</h3>
                             <span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs font-medium">In Progress</span>
                         </div>
-                        <p class="text-slate-600 mb-4 flex-grow">A full-stack application built with React and a Python (Flask) backend to create a searchable knowledge base. A tangible example of how I bridge the gap between technical implementation and user-centric problem-solving for support teams.</p>
+                        <p class="text-slate-800 dark:text-slate-200 mb-4 flex-grow font-medium">A full-stack application built with React and a Python (Flask) backend to create a searchable knowledge base. A tangible example of how I bridge the gap between technical implementation and user-centric problem-solving for support teams.</p>
                         <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">React</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Python</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Flask</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">MongoDB</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">React</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">Python</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">Flask</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">MongoDB</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <a href="https://github.com/apoorvanand" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
@@ -611,17 +901,17 @@
                     </div>
                     
                     <!-- Project Card 2 -->
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+                    <div class="bg-white/70 dark:bg-slate-700/70 backdrop-blur-md p-6 rounded-xl shadow-lg border border-indigo-200/40 dark:border-indigo-400/40 hover:shadow-xl hover:border-indigo-300/60 dark:hover:border-indigo-300/60 transition-all duration-300 flex flex-col h-full scale-in">
                         <div class="flex justify-between items-start mb-4">
                             <h3 class="text-xl font-semibold text-indigo-700">Smart Contract Marketplace</h3>
                             <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Completed</span>
                         </div>
-                        <p class="text-slate-600 mb-4 flex-grow">A decentralized marketplace built on Ethereum that allows users to list, buy, and sell digital assets. Implemented smart contracts with Solidity and created a responsive frontend with React and Web3.js.</p>
+                        <p class="text-slate-800 dark:text-slate-200 mb-4 flex-grow font-medium">A decentralized marketplace built on Ethereum that allows users to list, buy, and sell digital assets. Implemented smart contracts with Solidity and created a responsive frontend with React and Web3.js.</p>
                         <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Solidity</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">React</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Web3.js</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Ethereum</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">Solidity</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">React</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">Web3.js</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">Ethereum</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <a href="https://github.com/apoorvanand" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
@@ -631,26 +921,27 @@
                                 GitHub
                             </a>
                             <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
-                                </svg>
+                                <div class="glitter-ball w-5 h-5 mr-1 rounded-full bg-gradient-to-br from-emerald-300 via-blue-300 to-indigo-400 animate-pulse shadow-lg relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-tr from-white/40 to-transparent rounded-full"></div>
+                                    <div class="absolute top-1 left-1 w-1 h-1 bg-white/80 rounded-full animate-ping"></div>
+                                </div>
                                 Demo
                             </a>
                         </div>
                     </div>
                     
                     <!-- Project Card 3 -->
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+                    <div class="bg-white/70 dark:bg-slate-700/70 backdrop-blur-md p-6 rounded-xl shadow-lg border border-indigo-200/40 dark:border-indigo-400/40 hover:shadow-xl hover:border-indigo-300/60 dark:hover:border-indigo-300/60 transition-all duration-300 flex flex-col h-full scale-in">
                         <div class="flex justify-between items-start mb-4">
                             <h3 class="text-xl font-semibold text-indigo-700">Technical Support Dashboard</h3>
                             <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Completed</span>
                         </div>
-                        <p class="text-slate-600 mb-4 flex-grow">An internal tool developed to streamline technical support workflows. Features include case tracking, knowledge base integration, and performance analytics. Reduced average case resolution time by 30%.</p>
+                        <p class="text-slate-800 dark:text-slate-200 mb-4 flex-grow font-medium">An internal tool developed to streamline technical support workflows. Features include case tracking, knowledge base integration, and performance analytics. Reduced average case resolution time by 30%.</p>
                         <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">JavaScript</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Node.js</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Express</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">MongoDB</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">JavaScript</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">Node.js</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">Express</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">MongoDB</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <a href="https://github.com/apoorvanand" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
@@ -664,17 +955,17 @@
                     </div>
                     
                     <!-- Project Card 4 -->
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+                    <div class="bg-white/70 dark:bg-slate-700/70 backdrop-blur-md p-6 rounded-xl shadow-lg border border-indigo-200/40 dark:border-indigo-400/40 hover:shadow-xl hover:border-indigo-300/60 dark:hover:border-indigo-300/60 transition-all duration-300 flex flex-col h-full scale-in">
                         <div class="flex justify-between items-start mb-4">
                             <h3 class="text-xl font-semibold text-indigo-700">Interactive Portfolio</h3>
                             <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Completed</span>
                         </div>
-                        <p class="text-slate-600 mb-4 flex-grow">This very portfolio website! A responsive, interactive resume built with modern web technologies. Features include interactive charts, smooth animations, and a clean, professional design.</p>
+                        <p class="text-slate-800 dark:text-slate-200 mb-4 flex-grow font-medium">This very portfolio website! A responsive, interactive resume built with modern web technologies. Features include interactive charts, smooth animations, and a clean, professional design.</p>
                         <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">HTML5</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Tailwind CSS</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">JavaScript</span>
-                            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">Chart.js</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">HTML5</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">Tailwind CSS</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">JavaScript</span>
+                            <span class="px-2 py-1 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium">Chart.js</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <a href="https://github.com/apoorvanand" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
@@ -684,9 +975,10 @@
                                 GitHub
                             </a>
                             <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
-                                </svg>
+                                <div class="glitter-ball w-5 h-5 mr-1 rounded-full bg-gradient-to-br from-rose-300 via-orange-300 to-yellow-400 animate-pulse shadow-lg relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-tr from-white/40 to-transparent rounded-full"></div>
+                                    <div class="absolute top-1 left-1 w-1 h-1 bg-white/80 rounded-full animate-ping"></div>
+                                </div>
                                 Live Site
                             </a>
                         </div>
@@ -695,9 +987,9 @@
             </section>
 
             <!-- Education Section -->
-            <section id="education" class="mb-16 fade-in" style="animation-delay: 0.4s;">
-                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 pb-3 mb-6">Education</h2>
-                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+            <section id="education" class="mb-16 fade-in relative z-10 bg-white/60 dark:bg-slate-800/60 backdrop-blur-lg rounded-2xl p-8 border border-slate-200/30 dark:border-slate-700/30 shadow-xl" style="animation-delay: 0.4s;">
+                <h2 class="text-3xl font-bold border-b-2 border-indigo-200 dark:border-indigo-400/50 pb-3 mb-6 text-slate-900 dark:text-slate-100">Education</h2>
+                <div class="bg-white/70 dark:bg-slate-700/70 backdrop-blur-md p-6 rounded-xl shadow-lg border border-indigo-200/40 dark:border-indigo-400/40">
                     <h3 class="text-xl font-semibold text-indigo-700">B.Tech, Computer Science & Engineering</h3>
                     <p class="text-slate-500">MIT-WPU, Pune (2022)</p>
                     <p class="mt-4 text-slate-600">Ongoing learning in Data Science, Machine Learning, and CompTIA Security+.</p>
@@ -718,50 +1010,39 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Radar Chart
+            // Initialize Clean Radar Chart
             const ctx = document.getElementById('skillsChart').getContext('2d');
+            
             const skillsChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
                     labels: ['Client Engineering', 'Frontend Dev', 'Backend Dev', 'Web3', 'Problem Solving', 'Platform Tools'],
                     datasets: [{
-                        label: 'Skill Area Balance',
+                        label: 'Skills',
                         data: [9, 8.5, 7, 7.5, 9.5, 8],
                         backgroundColor: 'rgba(79, 70, 229, 0.2)',
                         borderColor: 'rgba(79, 70, 229, 1)',
                         pointBackgroundColor: 'rgba(79, 70, 229, 1)',
                         pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(79, 70, 229, 1)'
+                        pointBorderWidth: 2,
+                        borderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(30, 41, 59, 0.2)' },
-                            grid: { color: 'rgba(30, 41, 59, 0.2)' },
-                            pointLabels: { 
-                                font: { size: 14, weight: '600' },
-                                color: '#334155'
-                            },
-                            ticks: {
-                                backdropColor: 'rgba(248, 250, 252, 0)',
-                                color: '#64748b',
-                                stepSize: 2
-                            },
-                            suggestedMin: 0,
-                            suggestedMax: 10
+                    plugins: {
+                        legend: {
+                            display: false
                         }
                     },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.raw}/10`;
-                                }
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                stepSize: 2,
+                                display: false
                             }
                         }
                     }
@@ -852,22 +1133,30 @@
             // Initialize with first timeline item expanded
             toggleDetails('details-1');
 
-            // Lazy loading animations for performance
-            const lazyElements = document.querySelectorAll('.fade-in');
-            const lazyObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+            // Advanced scroll-triggered animations with staggered effects
+            const animatedElements = document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .scale-in, .stagger-item');
+            const animationObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        lazyObserver.unobserve(entry.target);
+                        // Add staggered delay for elements with stagger-item class
+                        if (entry.target.classList.contains('stagger-item')) {
+                            const staggerDelay = Array.from(entry.target.parentElement.children).indexOf(entry.target) * 100;
+                            setTimeout(() => {
+                                entry.target.classList.add('visible');
+                            }, staggerDelay);
+                        } else {
+                            entry.target.classList.add('visible');
+                        }
+                        animationObserver.unobserve(entry.target);
                     }
                 });
             }, {
-                threshold: 0.1,
-                rootMargin: '50px'
+                threshold: 0.15,
+                rootMargin: '30px'
             });
 
-            lazyElements.forEach(element => {
-                lazyObserver.observe(element);
+            animatedElements.forEach(element => {
+                animationObserver.observe(element);
             });
 
             // Optimize scroll performance with throttling
@@ -951,12 +1240,314 @@
                 link.addEventListener('click', closeMobileMenu);
             });
 
+            // Theme Toggle Functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            
+            // Check for saved theme preference or default to light mode
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+            
+            // Theme toggle event listener
+            themeToggle.addEventListener('click', () => {
+                const isDark = document.documentElement.classList.contains('dark');
+                
+                if (isDark) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                }
+            });
+
             // Close mobile menu on escape key
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
                     closeMobileMenu();
                 }
             });
+
+            // Glassy Rain Effect Background
+            if (window.innerWidth >= 1024) {
+                const canvas = document.getElementById('three-bg');
+                const ctx = canvas.getContext('2d');
+                
+                // Set canvas size
+                function resizeCanvas() {
+                    canvas.width = canvas.clientWidth;
+                    canvas.height = canvas.clientHeight;
+                }
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+                
+                // Rain drops array
+                const rainDrops = [];
+                const maxDrops = 150;
+                
+                // Mouse interaction variables
+                let mouseX = 0;
+                let mouseY = 0;
+                
+                // Track mouse movement
+                canvas.addEventListener('mousemove', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    mouseX = e.clientX - rect.left;
+                    mouseY = e.clientY - rect.top;
+                });
+                
+                // Rain drop class
+                class RainDrop {
+                    constructor() {
+                        this.reset();
+                        this.y = Math.random() * canvas.height;
+                    }
+                    
+                    reset() {
+                        this.x = Math.random() * canvas.width;
+                        this.y = -10;
+                        this.length = Math.random() * 20 + 10;
+                        this.speed = Math.random() * 3 + 2;
+                        this.opacity = Math.random() * 0.6 + 0.2;
+                        this.thickness = Math.random() * 2 + 1;
+                    }
+                    
+                    update() {
+                        // Mouse interaction - drops avoid mouse cursor
+                        const dx = this.x - mouseX;
+                        const dy = this.y - mouseY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 100) {
+                            this.x += (dx / distance) * 2;
+                            this.speed *= 0.8;
+                        } else {
+                            this.speed = Math.random() * 3 + 2;
+                        }
+                        
+                        this.y += this.speed;
+                        
+                        // Reset when drop goes off screen
+                        if (this.y > canvas.height + this.length) {
+                            this.reset();
+                        }
+                    }
+                    
+                    draw() {
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const gradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.length);
+                        
+                        // Use header gradient colors for rain effect
+                        const colors = isDark ? 
+                            ['#a78bfa', '#c084fc', '#fb7185', '#fbbf24', '#34d399', '#60a5fa'] :
+                            ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'];
+                        
+                        // Pick a random color from the gradient palette
+                        const colorIndex = Math.floor(Math.random() * colors.length);
+                        const selectedColor = colors[colorIndex];
+                        
+                        // Convert hex to rgba
+                        const hex = selectedColor.replace('#', '');
+                        const r = parseInt(hex.substr(0, 2), 16);
+                        const g = parseInt(hex.substr(2, 2), 16);
+                        const b = parseInt(hex.substr(4, 2), 16);
+                        
+                        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${this.opacity})`);
+                        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+                        
+                        ctx.strokeStyle = gradient;
+                        ctx.lineWidth = this.thickness;
+                        ctx.lineCap = 'round';
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(this.x, this.y);
+                        ctx.lineTo(this.x, this.y + this.length);
+                        ctx.stroke();
+                        
+                        // Add glassy effect with highlights
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity * 0.3})`;
+                        ctx.lineWidth = this.thickness * 0.3;
+                        ctx.beginPath();
+                        ctx.moveTo(this.x - 0.5, this.y);
+                        ctx.lineTo(this.x - 0.5, this.y + this.length * 0.7);
+                        ctx.stroke();
+                    }
+                }
+                
+                // Initialize rain drops
+                for (let i = 0; i < maxDrops; i++) {
+                    rainDrops.push(new RainDrop());
+                }
+                
+                let animationId;
+                let isVisible = true;
+                
+                // Animation loop
+                function animate() {
+                    if (!isVisible) return;
+                    
+                    animationId = requestAnimationFrame(animate);
+                    
+                    // Clear canvas with slight trail effect
+                    ctx.fillStyle = 'rgba(248, 250, 252, 0.1)';
+                    if (document.documentElement.classList.contains('dark')) {
+                        ctx.fillStyle = 'rgba(15, 23, 42, 0.1)';
+                    }
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Update and draw rain drops
+                    rainDrops.forEach(drop => {
+                        drop.update();
+                        drop.draw();
+                    });
+                }
+                
+                // Pause animation when tab is not visible
+                document.addEventListener('visibilitychange', () => {
+                    isVisible = !document.hidden;
+                    if (isVisible) {
+                        animate();
+                    } else {
+                        cancelAnimationFrame(animationId);
+                    }
+                });
+                
+                // Start animation
+                animate();
+            }
+        });
+        
+        // Dynamic navigation indicator
+        const navIndicator = document.getElementById('nav-indicator');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section[id]');
+        
+        // Set initial active state
+        function setActiveNavLink(activeLink) {
+            navLinks.forEach(link => link.classList.remove('active'));
+            if (activeLink && navIndicator) {
+                activeLink.classList.add('active');
+                const linkRect = activeLink.getBoundingClientRect();
+                const navRect = activeLink.closest('#nav-links').getBoundingClientRect();
+                const top = linkRect.top - navRect.top + linkRect.height / 2;
+                
+                navIndicator.style.top = top + 'px';
+                navIndicator.classList.add('active');
+            } else if (navIndicator) {
+                navIndicator.classList.remove('active');
+            }
+        }
+        
+        // Intersection Observer for navigation highlighting
+        const navObserver = new IntersectionObserver((entries) => {
+            let activeSection = null;
+            
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    activeSection = entry.target;
+                }
+            });
+            
+            if (activeSection) {
+                const activeLink = document.querySelector(`a[href="#${activeSection.id}"]`);
+                setActiveNavLink(activeLink);
+            }
+        }, {
+            threshold: 0.3,
+            rootMargin: '-20% 0px -70% 0px'
+        });
+        
+        // Observe all sections
+        sections.forEach(section => {
+            navObserver.observe(section);
+        });
+        
+        // Smooth scroll for navigation links
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Interactive cursor follower
+        const cursorFollower = document.createElement('div');
+        cursorFollower.className = 'cursor-follower';
+        document.body.appendChild(cursorFollower);
+        
+        let mouseX = 0, mouseY = 0;
+        let followerX = 0, followerY = 0;
+        
+        // Update mouse position
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        
+        // Smooth cursor following animation
+        function updateCursorFollower() {
+            const speed = 0.15;
+            followerX += (mouseX - followerX) * speed;
+            followerY += (mouseY - followerY) * speed;
+            
+            cursorFollower.style.left = followerX + 'px';
+            cursorFollower.style.top = followerY + 'px';
+            
+            requestAnimationFrame(updateCursorFollower);
+        }
+        updateCursorFollower();
+        
+        // Add hover effects for interactive elements
+        const interactiveElements = document.querySelectorAll('a, button, .nav-link, .mobile-nav-link, .skill-item, .project-card');
+        
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                cursorFollower.classList.add('hover');
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                cursorFollower.classList.remove('hover');
+            });
+            
+            element.addEventListener('mousedown', () => {
+                cursorFollower.classList.add('click');
+            });
+            
+            element.addEventListener('mouseup', () => {
+                cursorFollower.classList.remove('click');
+            });
+        });
+        
+        // Hide cursor follower when mouse leaves window
+        document.addEventListener('mouseleave', () => {
+            cursorFollower.style.opacity = '0';
+        });
+        
+        document.addEventListener('mouseenter', () => {
+            cursorFollower.style.opacity = '1';
         });
     </script>
 </body>
