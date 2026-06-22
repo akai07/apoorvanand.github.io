@@ -1,26 +1,146 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: "Century Gothic";
+  src: url("/assets/fonts/CenturyGothic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Century Gothic";
+  src: url("/assets/fonts/CenturyGothic-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Century Gothic";
+  src: url("/assets/fonts/CenturyGothic-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("/assets/fonts/JosefinSans-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("/assets/fonts/JosefinSans-ExtraLight.woff2") format("woff2");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0d0d20;
+  --foreground: oklch(0.95 0 0);
+  --card: #0d0d20;
+  --card-foreground: oklch(0.95 0 0);
+  --popover: #0d0d20;
+  --popover-foreground: oklch(0.95 0 0);
+  --primary: #a78bfa;
+  --primary-foreground: #1a0a3e;
+  --secondary: #1a0a3e;
+  --secondary-foreground: oklch(0.95 0 0);
+  --muted: #2d1b69;
+  --muted-foreground: oklch(0.7 0 0);
+  --accent: #2d1b69;
+  --accent-foreground: oklch(0.95 0 0);
+  --section-bg: #0a0317;
+  --section-bg-alt: #0d0d20;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.22 0 0);
+  --input: oklch(0.22 0 0);
+  --ring: #a78bfa;
+  --radius: 0.75rem;
+}
+
+html.light {
+  --background: #f0f8f0;
+  --foreground: #094b65;
+  --card: #ffffff;
+  --card-foreground: #094b65;
+  --popover: #ffffff;
+  --popover-foreground: #094b65;
+  --primary: #094b65;
+  --primary-foreground: #ffffff;
+  --secondary: #e8f5e9;
+  --secondary-foreground: #094b65;
+  --muted: #c8e6c9;
+  --muted-foreground: #2d6a4f;
+  --accent: #c8e6c9;
+  --accent-foreground: #094b65;
+  --section-bg: #ffffff;
+  --section-bg-alt: #e8f5e9;
+  --border: oklch(0.85 0 0);
+  --input: oklch(0.85 0 0);
+  --ring: #094b65;
 }
 
 @theme inline {
+  --font-sans: "Century Gothic", "Inter", sans-serif;
+  --font-mono: var(--font-geist-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    background: var(--section-bg);
+    @apply text-foreground;
+    font-family: "Century Gothic", "Inter", sans-serif;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
