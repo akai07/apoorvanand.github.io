@@ -7,17 +7,17 @@ import { useTheme } from "@/components/theme-provider"
 
 const layers = {
   dark: [
-    { src: "/moon/stars.png", speed: 0.5, speedAxis: "x", z: 1, mix: undefined },
-    { src: "/moon/moon.png", speed: -1.05, speedAxis: "y", z: 2, mix: "screen" as const },
-    { src: "/moon/mountains_behind.png", speed: -0.35, speedAxis: "y", z: 3, mix: undefined },
-    { src: "/moon/mountains_front.png", speed: 0, speedAxis: "y", z: 10, mix: undefined },
+    { src: "moon/stars.png", speed: 0.5, speedAxis: "x", z: 1, mix: undefined },
+    { src: "moon/moon.png", speed: -1.05, speedAxis: "y", z: 2, mix: "screen" as const },
+    { src: "moon/mountains_behind.png", speed: -0.35, speedAxis: "y", z: 3, mix: undefined },
+    { src: "moon/mountains_front.png", speed: 0, speedAxis: "y", z: 10, mix: undefined },
   ],
   light: [
-    { src: "/jungle/bird1.png", speed: 2.0, speedAxis: "x", z: 4, mix: undefined },
-    { src: "/jungle/bird2.png", speed: -1.5, speedAxis: "x", z: 3, mix: undefined },
-    { src: "/jungle/forest.png", speed: -0.2, speedAxis: "y", z: 5, mix: undefined },
-    { src: "/jungle/rocks.png", speed: 0, speedAxis: "y", z: 9, mix: undefined },
-    { src: "/jungle/water.png", speed: 0, speedAxis: "y", z: 10, mix: undefined },
+    { src: "jungle/bird1.png", speed: 2.0, speedAxis: "x", z: 4, mix: undefined },
+    { src: "jungle/bird2.png", speed: -1.5, speedAxis: "x", z: 3, mix: undefined },
+    { src: "jungle/forest.png", speed: -0.2, speedAxis: "y", z: 5, mix: undefined },
+    { src: "jungle/rocks.png", speed: 0, speedAxis: "y", z: 9, mix: undefined },
+    { src: "jungle/water.png", speed: 0, speedAxis: "y", z: 10, mix: undefined },
   ],
 }
 
@@ -145,7 +145,7 @@ export default function Hero() {
             View My Work
           </button>
           <a
-            href="/resume.pdf"
+            href="resume.pdf"
             download
             className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full border px-5 text-sm transition-all hover:scale-105"
             style={{

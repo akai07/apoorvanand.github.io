@@ -108,7 +108,7 @@ export default function Contact() {
             GitHub
           </a>
           <a
-            href="/resume.pdf"
+            href="resume.pdf"
             download
             className="group inline-flex h-12 items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-6 text-sm text-primary transition-all hover:border-primary/60 hover:bg-primary/20"
           >
